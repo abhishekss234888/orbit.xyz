@@ -66,11 +66,11 @@ import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWith
 import { getFirestore, doc, runTransaction, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
 // ── Fill these in from Firebase console → Project settings → Your apps (same values in main.html) ──
 const firebaseConfig = {
-  apiKey: 'YOUR_API_KEY',
-  authDomain: 'YOUR_PROJECT_ID.firebaseapp.com',
-  databaseURL: 'https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com',
-  projectId: 'YOUR_PROJECT_ID',
-  appId: 'YOUR_APP_ID'
+  apiKey: 'AIzaSyAk7xXeYefjx64sLUX0wVe7wDTyRvpvb08',
+  authDomain: 'orbit-xyz.firebaseapp.com',
+  databaseURL: 'https://orbit-xyz-default-rtdb.firebaseio.com',
+  projectId: 'orbit-xyz',
+  appId: '1:610426346586:web:e4220f3d4457b3445b4c63'
 };
 const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app);
 
@@ -99,7 +99,7 @@ function el(tag, props = {}, ...kids) {
 const ERR = {
   'auth/invalid-credential': 'Wrong email or password.',
   'auth/invalid-email': 'That email address does not look right.',
-  'auth/email-already-in-use': 'An account with that email already exists.',
+  'auth/email-already-in-use': 'email already exists.',
   'auth/weak-password': 'Choose a stronger password.',
   'auth/too-many-requests': 'Too many attempts. Wait a minute and try again.',
   'auth/network-request-failed': 'No connection. Check your network.'
