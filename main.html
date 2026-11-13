@@ -188,7 +188,46 @@ html{-webkit-tap-highlight-color:transparent}a,button{touch-action:manipulation}
 </div>
 <div class="sheetwrap" id="sheet" hidden><div class="scrim" id="scrim"></div><section class="sheet" id="sheetBox" role="dialog" aria-modal="true"></section></div>
 <div id="toasts" role="status" aria-live="polite"></div>
-<script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+  import { getAuth } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+  import { getFirestore, collection, query, where, orderBy, limit,
+           onSnapshot, addDoc, serverTimestamp }
+    from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAk7xXeYefjx64sLUX0wVe7wDTyRvpvb08",
+    authDomain: "orbit-xyz.firebaseapp.com",
+    projectId: "orbit-xyz",
+    storageBucket: "orbit-xyz.firebasestorage.app",
+    messagingSenderId: "610426346586",
+    appId: "1:610426346586:web:e4220f3d4457b3445b4c63"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  export const watchChats = (uid, cb) =>
+    onSnapshot(
+      query(collection(db, "chats"), where("members", "array-contains", uid), orderBy("updatedAt", "desc")),
+      s => cb(s.docs.map(d => ({ id: d.id, ...d.data() })))
+    );
+
+  export const watchMessages = (chatId, cb) =>
+    onSnapshot(
+      query(collection(db, "chats", chatId, "messages"), orderBy("createdAt", "asc"), limit(50)),
+      s => cb(s.docs.map(d => ({ id: d.id, ...d.data() })))
+    );
+
+  export const sendMessage = (chatId, uid, text) =>
+    addDoc(collection(db, "chats", chatId, "messages"), {
+      senderId: uid, text, createdAt: serverTimestamp()
+    });
+
+  export { auth, db };
+</script>
+  <script>
 (() => {
   const $ = (i) => document.getElementById(i);
   const get = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
