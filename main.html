@@ -1,0 +1,940 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<title>Orbit</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Conversations in their natural orbit.">
+<meta name="robots" content="noindex,nofollow,noarchive,nosnippet,noimageindex">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#0E0F11">
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js">
+<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js">
+<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js">
+
+<style>:root,[data-theme=dark]{color-scheme:dark;--bg:#0E0F11;--bg-2:#121316;--surface:#17191D;--surface-2:#1E2126;--surface-3:#262A31;--hover:rgba(255,255,255,.045);--selected:rgba(232,162,91,.11);--line:rgba(255,255,255,.07);--line-2:rgba(255,255,255,.12);--hi:rgba(255,255,255,.06);--tx:#F1EFEA;--tx-2:#ABA8A1;--tx-3:#8A8781;--accent:#E8A25B;--accent-hi:#F4B672;--accent-lo:#DB9040;--ink:#1B1207;--ring:rgba(232,162,91,.34);--tint:rgba(232,162,91,.16);--online:#5BD28A;--danger:#F0645B;--danger-bg:rgba(240,100,91,.14);--glass:rgba(26,28,33,.74);--glass-solid:#1B1D22;--me-a:#F0AC63;--me-b:#E2984A;--me-tx:#1B1207;--them-a:#21252B;--them-b:#1B1E23;--them-tx:#F1EFEA;--scrim:rgba(4,5,6,.56);--glow:rgba(232,162,91,.075);--sh-1:0 1px 2px rgba(0,0,0,.35);--sh-2:0 10px 28px -10px rgba(0,0,0,.6),0 2px 6px rgba(0,0,0,.25);--sh-3:0 30px 70px -18px rgba(0,0,0,.75),0 8px 22px -8px rgba(0,0,0,.45)}
+[data-theme=light]{color-scheme:light;--bg:#F6F3EE;--bg-2:#F1EDE6;--surface:#FBF9F5;--surface-2:#FFFFFF;--surface-3:#F3EFE8;--hover:rgba(40,30,15,.05);--selected:rgba(181,96,12,.09);--line:rgba(40,30,15,.09);--line-2:rgba(40,30,15,.15);--hi:rgba(255,255,255,.8);--tx:#1B1A17;--tx-2:#57534C;--tx-3:#7C776E;--accent:#B5600C;--accent-hi:#C66F18;--accent-lo:#A35509;--ink:#FFF8EE;--ring:rgba(181,96,12,.3);--tint:rgba(181,96,12,.12);--online:#1E9E5A;--danger:#C93C33;--danger-bg:rgba(201,60,51,.1);--glass:rgba(251,249,245,.8);--glass-solid:#FBF9F5;--me-a:#C26B14;--me-b:#AD5A0A;--me-tx:#FFF8EE;--them-a:#ECE7DE;--them-b:#E7E1D7;--them-tx:#1B1A17;--scrim:rgba(30,22,10,.36);--glow:rgba(181,96,12,.07);--sh-1:0 1px 2px rgba(60,40,10,.1);--sh-2:0 10px 28px -10px rgba(60,40,10,.25),0 2px 6px rgba(60,40,10,.08);--sh-3:0 30px 70px -18px rgba(60,40,10,.35),0 8px 22px -8px rgba(60,40,10,.18)}
+:root{--font:ui-sans-serif,-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI Variable Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--out:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.32,.72,0,1);--tap:cubic-bezier(.2,0,0,1);--std:cubic-bezier(.4,0,.2,1);--font-scale:1}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html{font-size:calc(100% * var(--font-scale));-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+body{margin:0;min-height:100dvh;background:var(--bg);color:var(--tx);font:400 .9375rem/1.45 var(--font);letter-spacing:-.006em;-webkit-font-smoothing:antialiased;overscroll-behavior:none}
+h1,h2{margin:0;font-weight:650;letter-spacing:-.022em;line-height:1.15}
+button,input,textarea{font:inherit;color:inherit}
+a,button{touch-action:manipulation}
+::selection{background:var(--ring)}
+::placeholder{color:var(--tx-3)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}}
+@keyframes fade{from{opacity:0}}
+@keyframes pop{from{opacity:0;transform:scale(.4)}}
+.splash{position:fixed;inset:0;display:grid;place-items:center}
+.splash i{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 7px var(--tint);animation:pop .7s var(--out) both}
+.wordmark{font-size:1.75rem;font-weight:700;letter-spacing:-.04em;line-height:1.1;background:linear-gradient(180deg,var(--tx),var(--tx-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.btn{min-height:44px;padding:0 20px;border:1px solid var(--line-2);border-radius:12px;background:var(--surface-2);color:var(--tx);font-weight:600;font-size:.9rem;letter-spacing:-.005em;cursor:pointer;box-shadow:inset 0 1px 0 var(--hi),var(--sh-1);transition:transform .12s var(--tap),background-color .16s var(--std),filter .16s var(--std)}
+@media (hover:hover){.btn:hover:not(:disabled){background:var(--surface-3)}.btn--primary:hover:not(:disabled){background:linear-gradient(180deg,var(--accent-hi),var(--accent-lo));filter:brightness(1.06)}}
+.btn:active:not(:disabled){transform:scale(.975)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn--primary{border-color:transparent;background:linear-gradient(180deg,var(--accent-hi),var(--accent-lo));color:var(--ink);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 18px -8px var(--ring)}
+.input{width:100%;min-height:46px;padding:0 14px;background:var(--surface);color:var(--tx);border:1px solid var(--line);border-radius:12px;font-size:1rem;box-shadow:inset 0 1px 2px rgba(0,0,0,.16);transition:border-color .16s var(--std),box-shadow .16s var(--std)}
+.input:hover{border-color:var(--line-2)}
+.input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+.form{display:grid;gap:16px}
+.form-msg{margin:0;min-height:1.25em;font-size:.8125rem}
+.form-error{color:var(--danger)}
+.ext{position:fixed;top:calc(10px + env(safe-area-inset-top));right:12px;z-index:90;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:var(--tx-2);background:var(--glass-solid);border:1px solid var(--line-2);box-shadow:var(--sh-1),inset 0 1px 0 var(--hi);text-decoration:none;transition:transform .12s var(--tap),color .16s var(--std),border-color .16s var(--std)}
+.ext:hover{color:var(--accent);border-color:var(--accent)}
+.ext:active{transform:scale(.92)}
+@supports (backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px)){.ext{background:var(--glass);-webkit-backdrop-filter:blur(12px) saturate(150%);backdrop-filter:blur(12px) saturate(150%)}}
+@media (prefers-reduced-transparency:reduce){.ext{background:var(--glass-solid);-webkit-backdrop-filter:none;backdrop-filter:none}}
+.app{height:100dvh;display:grid;grid-template-columns:minmax(0,1fr);background:radial-gradient(70% 50% at 100% 0,var(--glow),transparent 62%) no-repeat,var(--bg)}
+.app[data-view=list] .pane{display:none}.app[data-view=chat] .side{display:none}
+.side{display:flex;flex-direction:column;min-height:0;background:linear-gradient(180deg,var(--bg-2),var(--bg));border-right:1px solid var(--line)}
+.pane{display:flex;flex-direction:column;min-height:0;min-width:0}
+.pane>*{animation:fade .24s var(--std) both}
+.bar{display:flex;align-items:center;gap:8px;height:60px;padding:env(safe-area-inset-top) 60px 0 20px;box-sizing:content-box}
+.bar .wordmark{flex:1;font-size:1.3rem}
+.iconbtn{width:40px;height:40px;display:grid;place-items:center;border:0;border-radius:12px;background:transparent;color:var(--tx-2);cursor:pointer;text-decoration:none;transition:background-color .16s var(--std),color .16s var(--std),transform .12s var(--tap)}
+.iconbtn:hover{background:var(--hover);color:var(--tx)}.iconbtn:active{transform:scale(.92)}
+.ico,.back{display:grid}
+.tabs{display:flex;gap:2px;margin:0 16px 10px;padding:3px;border-radius:12px;background:var(--surface);box-shadow:inset 0 1px 2px rgba(0,0,0,.18)}
+.tabs button{flex:1;min-height:34px;border:0;border-radius:9px;background:transparent;color:var(--tx-2);cursor:pointer;font-weight:600;font-size:.8125rem;transition:background-color .2s var(--std),color .2s var(--std),box-shadow .2s var(--std)}
+.tabs button[aria-selected=true]{background:var(--surface-3);color:var(--tx);box-shadow:var(--sh-1),inset 0 1px 0 var(--hi)}
+.list{flex:1;overflow:auto;overscroll-behavior:contain;padding:0 8px 8px}
+.row{display:flex;gap:12px;align-items:center;width:100%;height:68px;padding:0 10px;border:0;border-radius:14px;background:transparent;color:inherit;text-align:left;text-decoration:none;cursor:pointer;content-visibility:auto;contain-intrinsic-size:auto 68px;transition:background-color .16s var(--std),transform .12s var(--tap)}
+@media (hover:hover){.row:hover{background:var(--hover)}}
+.row.is-active{background:var(--selected)}.row:active{transform:scale(.985)}
+.avatar{position:relative;flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,var(--tint),transparent 130%),var(--surface-2);color:var(--accent);font-weight:650;font-size:.875rem;box-shadow:inset 0 0 0 1px var(--line-2)}
+.row .avatar{width:46px;height:46px;font-size:1.0625rem}
+.avatar.is-online::after{content:"";position:absolute;right:0;bottom:0;width:11px;height:11px;border-radius:50%;background:var(--online);box-shadow:0 0 0 2px var(--bg-2)}
+.row__main{min-width:0;flex:1}
+.row__top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.row__name{font-weight:600;font-size:.9375rem;letter-spacing:-.012em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row time{flex:none;font-size:.6875rem;color:var(--tx-3);font-variant-numeric:tabular-nums}
+.row__prev{margin:2px 0 0;color:var(--tx-2);font-size:.8125rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row.is-unread .row__name{font-weight:700}.row.is-unread .row__prev{color:var(--tx)}
+.udot{flex:none;width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+.note{margin:0;padding:20px 12px;color:var(--tx-3);font-size:.875rem}
+.me{display:flex;align-items:center;gap:12px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+.who{display:grid;line-height:1.25;flex:1;min-width:0}.who span{font-weight:600}.who small{color:var(--tx-3);font-size:.75rem}
+.chead{display:flex;align-items:center;gap:12px;height:60px;padding:env(safe-area-inset-top) max(60px,calc((100% - 720px)/2)) 0 max(12px,calc((100% - 720px)/2));box-sizing:content-box;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--bg-2),transparent)}
+.chead__t{display:grid;line-height:1.25;min-width:0}.chead__t strong{font-weight:650;font-size:1rem;letter-spacing:-.015em}
+.chead small{color:var(--tx-3);font-size:.75rem}.chead small.is-typing{color:var(--accent)}
+.chead .vbtn{margin-left:auto}
+.msgs{flex:1;overflow:auto;display:flex;flex-direction:column;padding:16px max(16px,calc((100% - 720px)/2));overscroll-behavior:contain}
+.older{align-self:center;margin:0 0 12px;min-height:34px;padding:0 14px;border-radius:999px;font-size:.8125rem}
+.empty,.empty-pane{margin:auto;color:var(--tx-3);padding:24px}
+.msg{display:flex;margin-top:2px}.msg--first{margin-top:12px}.msg--me{justify-content:flex-end}
+.bubble{max-width:72%;padding:9px 14px 8px;border-radius:18px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.9375rem;line-height:1.4;box-shadow:var(--sh-1)}
+.msg--me .bubble{background:linear-gradient(180deg,var(--me-a),var(--me-b));color:var(--me-tx);border-bottom-left-radius:4px}
+.msg--them .bubble{background:linear-gradient(180deg,var(--them-a),var(--them-b));color:var(--them-tx);border-bottom-right-radius:4px;box-shadow:inset 0 0 0 1px var(--line),var(--sh-1)}
+.msg--del .bubble{font-style:italic;opacity:.65}
+.msg--enter .bubble{animation:msg-in .28s var(--out) both}
+@keyframes msg-in{from{opacity:0;transform:translateY(8px) scale(.97)}}
+.sender{display:block;font-size:.75rem;font-weight:600;color:var(--accent);margin-bottom:3px}
+.meta{display:block;font-size:.6875rem;margin-top:3px;text-align:right;opacity:.65;font-variant-numeric:tabular-nums}
+.compose{display:flex;align-items:flex-end;gap:10px;min-height:60px;padding:10px max(12px,calc((100% - 720px)/2)) calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:linear-gradient(0deg,var(--bg-2),transparent)}
+.compose textarea{flex:1;resize:none;max-height:120px;min-height:42px;padding:10px 16px;border:1px solid var(--line);border-radius:21px;background:var(--surface);color:var(--tx);font-size:1rem;line-height:1.4;box-shadow:inset 0 1px 2px rgba(0,0,0,.16);transition:border-color .16s var(--std),box-shadow .16s var(--std)}
+.compose textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+.send{flex:none;width:42px;height:42px;border:0;border-radius:50%;background:linear-gradient(180deg,var(--accent-hi),var(--accent-lo));color:var(--ink);display:grid;place-items:center;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 16px -8px var(--ring);transition:transform .12s var(--tap)}
+.send:active{transform:scale(.92)}
+.sheetwrap{position:fixed;inset:0;z-index:50}
+.scrim{position:absolute;inset:0;background:var(--scrim);animation:fade .24s var(--std) both}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-width:520px;margin:0 auto;max-height:88dvh;overflow:auto;overscroll-behavior:contain;padding:10px 20px calc(24px + env(safe-area-inset-bottom));background:var(--glass-solid);border:1px solid var(--line-2);border-bottom:0;border-radius:22px 22px 0 0;box-shadow:var(--sh-3),inset 0 1px 0 var(--hi);animation:sheet-in .42s var(--spring) both}
+.sheet::before{content:"";display:block;width:36px;height:4px;margin:0 auto 14px;border-radius:99px;background:var(--line-2)}
+.sheet h2{font-size:1.25rem;margin-bottom:14px}
+.sheet>*{animation:rise .4s var(--out) both}
+.sheet>:nth-child(1){animation-delay:.05s}.sheet>:nth-child(2){animation-delay:.08s}.sheet>:nth-child(3){animation-delay:.11s}.sheet>:nth-child(4){animation-delay:.14s}.sheet>:nth-child(n+5){animation-delay:.17s}
+@keyframes sheet-in{from{opacity:0;transform:translateY(28px)}}
+@keyframes pop-in{from{opacity:0;transform:scale(.96) translateY(8px)}}
+.sheet__actions{display:flex;gap:12px;margin-top:20px}.sheet__actions .btn{flex:1}
+.sheet .row{margin-top:2px}
+.pick{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:0 10px;border-radius:12px;cursor:pointer;transition:background-color .16s var(--std)}
+@media (hover:hover){.pick:hover{background:var(--hover)}}
+.pick input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+#toasts{position:fixed;left:0;right:0;bottom:calc(24px + env(safe-area-inset-bottom));display:grid;justify-items:center;gap:8px;z-index:80;pointer-events:none}
+.toast{max-width:min(92vw,420px);padding:11px 18px;border:1px solid var(--line-2);border-radius:14px;background:var(--glass-solid);color:var(--tx);font-size:.875rem;box-shadow:var(--sh-3);animation:toast-in .36s var(--spring) both}
+@keyframes toast-in{from{opacity:0;transform:translateY(12px) scale(.97)}}
+.skel{position:relative;overflow:hidden;height:60px;margin:6px 8px;border-radius:14px;background:var(--surface)}
+.skel::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,var(--line),transparent);transform:translateX(-100%);animation:shimmer 1.5s linear infinite}
+@keyframes shimmer{to{transform:translateX(100%)}}
+.lock{position:fixed;inset:0;z-index:60;background:#000;color:#33ff66;font:15px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;letter-spacing:0}
+.lock .t{margin:0;color:#1f9c47;white-space:pre}
+.prompt{display:flex;gap:12px;font-size:1.4rem}
+.prompt .ps{color:#1f9c47}.prompt .cell{white-space:pre;min-width:2ch}.prompt .cur{background:#33ff66;color:#000}
+.lock__hint{min-height:1.6em;margin:0;color:#ff5555;text-align:center}
+.pad{display:grid;grid-template-columns:repeat(3,76px);gap:10px}
+.key{height:52px;border:1px solid #1d6b36;background:#000;color:#33ff66;font:inherit;font-size:1.2rem;border-radius:0;cursor:pointer}
+.key:active{background:#33ff66;color:#000}
+@media (hover:hover){.key:hover{border-color:#33ff66}}
+.lock__exit{background:none;border:0;color:#1f9c47;font:inherit;cursor:pointer;padding:8px}
+@supports (backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px)){.toast,.sheet{background:var(--glass);-webkit-backdrop-filter:blur(16px) saturate(150%);backdrop-filter:blur(16px) saturate(150%)}}
+@media (prefers-reduced-transparency:reduce){.toast,.sheet{background:var(--glass-solid);-webkit-backdrop-filter:none;backdrop-filter:none}}
+@media (max-width:767px){.app[data-view=chat] .pane{animation:rise .34s var(--spring) both}.app[data-view=list] .side{animation:fade .24s var(--std) both}}
+@media (max-width:480px){.bubble{max-width:84%}}
+@media (min-width:768px){.app{grid-template-columns:360px minmax(0,1fr)}.app[data-view=list] .pane,.app[data-view=chat] .side{display:flex}.back{display:none}.sheet{inset:0;margin:auto;height:fit-content;max-height:80dvh;border-bottom:1px solid var(--line-2);border-radius:22px;animation-name:pop-in}.sheet::before{display:none}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.skel::after{animation:none}}
+.list,.msgs,.sheet{scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
+.btn--danger{border-color:transparent;background:var(--danger-bg);color:var(--danger);box-shadow:none}
+.link{background:none;border:0;padding:0;cursor:pointer;color:var(--accent);font-weight:500}
+.link:hover{text-decoration:underline;text-underline-offset:3px}
+</style>
+</head>
+<body>
+<div class="splash" id="splash"><i></i></div>
+<a class="ext" href="https://example.com" target="_blank" rel="noopener noreferrer" aria-label="Open example.com in a new tab" title="example.com"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></a>
+<div class="app" id="app" data-view="list" hidden>
+  <aside class="side">
+    <header class="bar">
+      <h1 class="wordmark">Orbit</h1>
+      <button class="iconbtn" id="gBtn" type="button" aria-label="New group"></button>
+    </header>
+    <div class="tabs" role="tablist">
+      <button role="tab" id="tabChats" aria-selected="true" type="button">Chats</button>
+      <button role="tab" id="tabPeople" aria-selected="false" type="button">People</button>
+    </div>
+    <nav class="list" id="list" aria-label="Conversations"></nav>
+    <footer class="me">
+      <div class="avatar" id="meAv" aria-hidden="true"></div>
+      <div class="who"><span id="meName"></span><small id="meHandle"></small></div>
+      <button class="btn" id="out" type="button">Sign out</button>
+    </footer>
+  </aside>
+  <section class="pane" id="pane"></section>
+</div>
+<div class="lock" id="lock" hidden role="dialog" aria-modal="true" aria-label="Enter PIN">
+  <p class="t">orbit@secure:~$ unlock</p>
+  <div class="prompt" id="prompt" aria-live="polite"></div>
+  <p class="lock__hint" id="lockHint" role="alert"></p>
+  <div class="pad" id="pad"></div>
+  <button class="lock__exit" id="lockOut" type="button">$ exit</button>
+</div>
+<div class="sheetwrap" id="sheet" hidden><div class="scrim" id="scrim"></div><section class="sheet" id="sheetBox" role="dialog" aria-modal="true"></section></div>
+<div id="toasts" role="status" aria-live="polite"></div>
+<script>
+(() => {
+  const $ = (i) => document.getElementById(i);
+  const get = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
+  const sget = (k) => { try { return sessionStorage.getItem(k); } catch { return null; } };
+  const sset = (k, v) => { try { sessionStorage.setItem(k, v); } catch { /* blocked */ } };
+  const sdel = (k) => { try { sessionStorage.removeItem(k); } catch { /* blocked */ } };
+  if (get('orbit.hint') !== '1') return void location.replace('index.html');
+  const th = get('orbit.theme') || 'dark';
+  document.documentElement.dataset.theme = th === 'system' ? (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark') : th;
+  $('splash').remove(); $('app').hidden = false;
+  for (let i = 0; i < 6; i++) { const d = document.createElement('div'); d.className = 'skel'; $('list').append(d); }
+
+  const PIN = '101111';                 // <- your number lock: digits only, shown two per column
+  const MAX_TRIES = 5, LOCKOUT_MS = 30000;
+  if (sget('orbit.unlocked') === '1') { window.orbitLock = Promise.resolve(); return; }
+  window.orbitLock = new Promise((resolve) => {
+    const lock = $('lock'), prompt = $('prompt'), hint = $('lockHint'), pad = $('pad');
+    const mk = (cls, text) => { const s = document.createElement('span'); s.className = cls; s.textContent = text; return s; };
+    const cells = [];
+    for (let c = 0; c < Math.ceil(PIN.length / 2); c++) { const cell = mk('cell', ''); cells.push(cell); prompt.append(mk('ps', '$'), cell); }
+    prompt.append(mk('ps', '$'));
+    let val = '', ticker;
+    const paint = () => cells.forEach((cell, c) => {
+      let s = '';
+      for (let i = 0; i < 2; i++) { const k = c * 2 + i; if (k < PIN.length) s += val[k] ?? '_'; }
+      cell.textContent = s;
+      cell.classList.toggle('cur', val.length >> 1 === c && val.length < PIN.length);
+    });
+    const lockedFor = () => Math.max(0, (+sget('orbit.until') || 0) - Date.now());
+    function tick() {
+      const left = lockedFor();
+      if (left > 0) { hint.textContent = `locked: retry in ${Math.ceil(left / 1000)}s`; return; }
+      clearInterval(ticker); hint.textContent = '';
+    }
+    function press(d) {
+      if (lockedFor() > 0 || val.length >= PIN.length) return;
+      val += d; paint();
+      if (val.length < PIN.length) return;
+      if (val === PIN) {
+        sset('orbit.unlocked', '1'); sdel('orbit.tries');
+        removeEventListener('keydown', onKey); clearInterval(ticker);
+        lock.hidden = true; return resolve();
+      }
+      const tries = (+sget('orbit.tries') || 0) + 1;
+      setTimeout(() => { val = ''; paint(); }, 200);
+      if (tries >= MAX_TRIES) { sset('orbit.until', String(Date.now() + LOCKOUT_MS)); sdel('orbit.tries'); ticker = setInterval(tick, 500); tick(); }
+      else { sset('orbit.tries', String(tries)); hint.textContent = `access denied [${tries}/${MAX_TRIES}]`; }
+    }
+    function onKey(e) { if (/^\d$/.test(e.key)) press(e.key); else if (e.key === 'Backspace') { val = val.slice(0, -1); paint(); } }
+    pad.replaceChildren(...['1', '2', '3', '4', '5', '6', '7', '8', '9', 'del', '0', 'clr'].map((k) => {
+      const b = document.createElement('button');
+      b.className = 'key'; b.type = 'button'; b.textContent = k;
+      b.onclick = () => { if (k === 'del') { val = val.slice(0, -1); paint(); } else if (k === 'clr') { val = ''; paint(); } else press(k); };
+      return b;
+    }));
+    $('lockOut').onclick = () => { window.__wantExit = true; document.dispatchEvent(new Event('orbit:signout')); };
+    paint(); lock.hidden = false;
+    if (lockedFor() > 0) { ticker = setInterval(tick, 500); tick(); }
+    addEventListener('keydown', onKey);
+  });
+})();
+</script>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+import { initializeAuth, indexedDBLocalPersistence, browserLocalPersistence, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+import * as R from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js';
+const firebaseConfig = {
+  apiKey: 'AIzaSyAk7xXeYefjx64sLUX0wVe7wDTyRvpvb08',
+  authDomain: 'orbit-xyz.firebaseapp.com',
+  databaseURL: 'https://orbit-xyz-default-rtdb.firebaseio.com',
+  projectId: 'orbit-xyz',
+  appId: '1:610426346586:web:e4220f3d4457b3445b4c63'
+};
+const app = initializeApp(firebaseConfig), auth = initializeAuth(app, { persistence: [indexedDBLocalPersistence, browserLocalPersistence] }), rdb = R.getDatabase(app);
+const $ = (id) => document.getElementById(id);
+const ICON = {
+  send: '<path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/>',
+  back: '<path d="M15 18l-6-6 6-6"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  users: '<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 5a3 3 0 0 1 0 6M21 20a6 6 0 0 0-4-5.6"/>',
+  lock: '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+  del: '<path d="M21 4H8l-6 8 6 8h13z"/><path d="M18 9l-6 6M12 9l6 6"/>'
+};
+const icon = (n) => {
+  const s = document.createElement('span');
+  s.className = 'ico';
+  s.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n]}</svg>`;
+  return s;
+};
+function el(tag, props = {}, ...kids) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(props)) {
+    if (v == null || v === false) continue;
+    if (k.startsWith('on')) n.addEventListener(k.slice(2), v);
+    else if (k === 'class') n.className = v;
+    else if (k === 'text') n.textContent = v;
+    else n.setAttribute(k, v === true ? '' : v);
+  }
+  n.append(...kids.flat().filter((x) => x != null));
+  return n;
+}
+const toast = (msg) => { const t = el('div', { class: 'toast', text: msg }); $('toasts').append(t); setTimeout(() => t.remove(), 3500); };
+const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+const clean = (s) => String(s).normalize('NFC').replace(/\r\n?/g, '\n').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F\u200B\u200C\u200E\u200F\u202A-\u202E\u2066-\u2069]/g, '').replace(/\n{3,}/g, '\n\n').trim().slice(0, 2000);
+const initial = (n) => (n || '?').trim().charAt(0).toUpperCase();
+const hm = new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' });
+const md = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
+const ago = (ms) => {
+  if (!ms) return '';
+  const s = (Date.now() - ms) / 1000;
+  return s < 60 ? 'now' : s < 3600 ? Math.floor(s / 60) + 'm' : s < 86400 ? hm.format(ms) : s < 172800 ? 'Yesterday' : md.format(ms);
+};
+const ms = (v) => (typeof v === 'number' ? v : 0);
+
+function applyTheme(t = 'dark') {
+  document.documentElement.dataset.theme = t === 'system' ? (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark') : t;
+}
+try { applyTheme(localStorage.getItem('orbit.theme') || 'dark'); } catch { /* storage blocked */ }
+
+// Presence and typing code was written against this accessor, so it keeps working unchanged.
+const rt = () => Promise.resolve({ m: R, db: rdb });
+
+// One connection node per tab; a surviving tab re-asserts "online" if a closing tab flips the shared node.
+async function startPresence(uid) {
+  const { m: R, db: rdb } = await rt();
+  const meRef = R.ref(rdb, `presence/${uid}`);
+  let conn = null, connected = false;
+  const online = () => R.set(meRef, { state: 'online', at: R.serverTimestamp() }).catch(() => {});
+  const offConn = R.onValue(R.ref(rdb, '.info/connected'), async (s) => {
+    connected = s.val() === true;
+    if (!connected) return;
+    conn = R.push(R.ref(rdb, `status/${uid}/connections`));
+    await R.onDisconnect(conn).remove();
+    await R.onDisconnect(meRef).set({ state: 'offline', at: R.serverTimestamp() });
+    R.set(conn, R.serverTimestamp()).catch(() => {});
+    online();
+  });
+  const offMe = R.onValue(meRef, (s) => { if (connected && s.val()?.state === 'offline') online(); });
+  return async () => {
+    offConn(); offMe(); connected = false;
+    if (conn) await R.remove(conn).catch(() => {});
+    await R.set(meRef, { state: 'offline', at: R.serverTimestamp() }).catch(() => {});
+  };
+}
+
+const me = { uid: '', name: '', username: '' };
+let chats = [], tab = 'chats', activeId = null, cleanups = [];
+// Names render instantly from localStorage, then refresh in one batched query.
+const PC = (() => { try { return JSON.parse(localStorage.getItem('orbit.pc') || '{}'); } catch { return {}; } })();
+const savePC = debounce(() => { try { localStorage.setItem('orbit.pc', JSON.stringify(PC)); } catch { /* storage blocked */ } }, 500);
+const READ = (() => { try { return JSON.parse(localStorage.getItem('orbit.read') || '{}'); } catch { return {}; } })();
+const saveRead = debounce(() => { try { localStorage.setItem('orbit.read', JSON.stringify(READ)); } catch { /* storage blocked */ } }, 500);
+const markRead = (id) => { const c = chats.find((x) => x.id === id); READ[id] = Math.max(Date.now(), ms(c?.lastMessage?.at)); saveRead(); };
+if (!READ._init) { READ._init = Date.now(); saveRead(); }
+const fetching = new Set();
+async function fetchProfiles(ids) {
+  ids = [...new Set(ids)].filter((x) => !PC[x] && !fetching.has(x));
+  if (!ids.length) return;
+  ids.forEach((x) => fetching.add(x));
+  await Promise.all(ids.map(async (x) => {
+    try { const u = (await R.get(R.ref(rdb, 'users/' + x))).val(); if (u) PC[x] = { name: u.name, username: u.username }; }
+    catch { /* retried on the next update */ }
+  }));
+  ids.forEach((x) => fetching.delete(x));
+  savePC(); renderList();
+}
+const getProfile = async (uid) => { await fetchProfiles([uid]); return PC[uid] || { name: 'Unknown', username: 'unknown' }; };
+
+// ── End-to-end encryption (direct chats) ──
+// ECDH P-256 key pair per user. The private key is stored non-extractable in IndexedDB on this device and
+// and never leaves it. Messages are sealed with a
+// per-pair AES-256-GCM key (ECDH + HKDF) before they reach the database, so the server only stores ciphertext.
+const enc8 = new TextEncoder(), dec8 = new TextDecoder();
+const b64 = (buf) => { const a = new Uint8Array(buf); let s = ''; for (let i = 0; i < a.length; i += 0x8000) s += String.fromCharCode(...a.subarray(i, i + 0x8000)); return btoa(s); };
+const unb64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+const ECDH = { name: 'ECDH', namedCurve: 'P-256' };
+const keyWaiters = new Set();
+const kv = {
+  open: () => new Promise((res, rej) => { const r = indexedDB.open('orbit-keys', 1); r.onupgradeneeded = () => r.result.createObjectStore('k'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }),
+  async get(k) { const d = await this.open(); return new Promise((res, rej) => { const q = d.transaction('k').objectStore('k').get(k); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); },
+  async set(k, v) { const d = await this.open(); return new Promise((res, rej) => { const x = d.transaction('k', 'readwrite'); x.objectStore('k').put(v, k); x.oncomplete = () => res(); x.onerror = () => rej(x.error); }); }
+};
+async function newKeys() {
+  const kp = await crypto.subtle.generateKey(ECDH, true, ['deriveBits']);
+  const priv = await crypto.subtle.exportKey('jwk', kp.privateKey);
+  return { privJwk: priv, pubJwk: { kty: 'EC', crv: 'P-256', x: priv.x, y: priv.y } };
+}
+const importPriv = (jwk) => crypto.subtle.importKey('jwk', jwk, ECDH, false, ['deriveBits']);
+const importPub = (jwk) => crypto.subtle.importKey('jwk', { kty: jwk.kty, crv: jwk.crv, x: jwk.x, y: jwk.y }, ECDH, true, []);
+async function loadLocalKeys(uid) {
+  try { const rec = await kv.get('key:' + uid); if (rec) { me.priv = rec.priv; me.pub = rec.pub; } } catch { /* private mode: keys last for this tab only */ }
+}
+async function ensureKeys(u, p) {
+  if (!p) return;                                   // profile unavailable (offline): retried on the next load
+  try {
+    let fresh = false;
+    if (!me.priv) {
+      const { privJwk, pubJwk } = await newKeys();
+      me.priv = await importPriv(privJwk); me.pub = pubJwk; fresh = true;
+      try { await kv.set('key:' + u.uid, { priv: me.priv, pub: me.pub }); } catch { /* not saved: keys last for this tab only */ }
+    }
+    const pk = p.publicKey;
+    if (!pk || fresh) await R.update(R.ref(rdb, 'users/' + u.uid), { publicKey: me.pub, updatedAt: R.serverTimestamp() });
+    else if (pk.x !== me.pub.x || pk.y !== me.pub.y) toast('Your account was set up on another device, so this device cannot read new messages. Clear this site’s data and sign in again to use this device instead.');
+    keyWaiters.forEach((f) => f());
+    renderList();
+  } catch { toast('Secure messaging could not start. Check your connection.'); }
+}
+const PUB = new Map();
+async function peerPub(peer) {
+  if (!PUB.has(peer)) {
+    const k = (await R.get(R.ref(rdb, 'users/' + peer + '/publicKey'))).val();
+    if (!k) throw Object.assign(new Error('nokey'), { peer });
+    PUB.set(peer, k);
+  }
+  return PUB.get(peer);
+}
+const sk = new Map();
+function sharedKey(peer) {
+  if (!me.priv) return Promise.reject(new Error('nopriv'));
+  if (!sk.has(peer)) {
+    sk.set(peer, (async () => {
+      const pub = await importPub(await peerPub(peer));
+      const bits = await crypto.subtle.deriveBits({ name: 'ECDH', public: pub }, me.priv, 256);
+      const hk = await crypto.subtle.importKey('raw', bits, 'HKDF', false, ['deriveKey']);
+      return crypto.subtle.deriveKey({ name: 'HKDF', hash: 'SHA-256', salt: enc8.encode([me.uid, peer].sort().join('_')), info: enc8.encode('orbit-e2ee-v1') }, hk, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+    })().catch((e) => { sk.delete(peer); throw e; }));
+  }
+  return sk.get(peer);
+}
+// additionalData binds each ciphertext to its chat and sender, so it cannot be replayed elsewhere
+async function seal(kf, chatId, senderId, text) {
+  const key = await kf(), iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv, additionalData: enc8.encode(`${chatId}|${senderId}`) }, key, enc8.encode(text));
+  return { text: b64(ct), iv: b64(iv) };
+}
+async function unseal(kf, chatId, senderId, m) {
+  try {
+    const key = await kf();
+    return dec8.decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(m.iv), additionalData: enc8.encode(`${chatId}|${senderId}`) }, key, unb64(m.text)));
+  } catch { return null; }
+}
+// 30-digit security code both people can compare out loud to confirm nobody is in the middle
+async function safetyCode(peer) {
+  const pk = await peerPub(peer);
+  const s = [`${me.pub.x}.${me.pub.y}`, `${pk.x}.${pk.y}`].sort().join('|');
+  const h = new DataView(await crypto.subtle.digest('SHA-256', enc8.encode(s)));
+  return Array.from({ length: 6 }, (_, i) => String(h.getUint32(i * 4) % 100000).padStart(5, '0')).join(' ');
+}
+const GK = new Map();
+const importGroupKey = (raw) => crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['encrypt', 'decrypt']);
+function groupEntry(gid) {
+  if (!GK.has(gid)) {
+    GK.set(gid, (async () => {
+      if (!me.priv) throw new Error('nopriv');
+      const s = await R.get(R.ref(rdb, `keys/${gid}/${me.uid}`));
+      if (!s.exists()) throw new Error('nokey');
+      const w = s.val(), k = await sharedKey(w.by);
+      const raw = new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(w.iv), additionalData: enc8.encode(`${gid}|${me.uid}|gk`) }, k, unb64(w.text)));
+      return { key: await importGroupKey(raw), raw };
+    })().catch((e) => { GK.delete(gid); throw e; }));
+  }
+  return GK.get(gid);
+}
+const groupKey = async (gid) => (await groupEntry(gid)).key;
+async function wrapGroupKey(member, gid, raw) {
+  const k = await sharedKey(member), iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv, additionalData: enc8.encode(`${gid}|${member}|gk`) }, k, raw);
+  return { by: me.uid, text: b64(ct), iv: b64(iv) };
+}
+const keyFor = (c) => () => (c.type === 'group' ? groupKey(c.id) : sharedKey(c.peer));
+const PV = new Map();
+function preview(c, peer) {
+  const lm = c.lastMessage;
+  if (!lm) return '';
+  const who = lm.senderId === me.uid ? 'You: ' : (c.type === 'group' && lm.senderName ? lm.senderName + ': ' : '');
+  if (lm.enc !== 1) return who + lm.text;           // message from before encryption was added
+  const k = c.id + '|' + lm.iv;
+  if (PV.has(k)) return who + (PV.get(k) ?? '🔒 Encrypted message');
+  if (me.priv) unseal(keyFor(c), c.id, lm.senderId, lm).then((x) => { PV.set(k, x); renderList(); });
+  return '🔒 Encrypted message';
+}
+
+// ── Chat list ──
+function row(c) {
+  const peer = c.type === 'direct' ? c.peer : null;
+  const cp = peer && PC[peer];
+  const title = el('span', { class: 'row__name', text: peer ? (cp ? cp.name : '…') : c.name || 'Group' });
+  const av = el('div', { class: 'avatar', text: peer ? (cp ? initial(cp.name) : '') : initial(c.name) });
+  const lm = c.lastMessage;
+  const unread = !!lm && lm.senderId !== me.uid && c.id !== activeId && ms(lm.at) > (READ[c.id] ?? READ._init ?? 0);
+  return el('a', { class: 'row' + (c.id === activeId ? ' is-active' : '') + (unread ? ' is-unread' : ''), href: `#/chats/${c.id}` }, av,
+    el('div', { class: 'row__main' },
+      el('div', { class: 'row__top' }, title, el('time', { text: ago(ms(lm?.at)) })),
+      el('p', { class: 'row__prev', text: preview(c, peer) })),
+    unread ? el('span', { class: 'udot' }) : null);
+}
+let rq = 0, chatsReady = false;
+function renderList() { cancelAnimationFrame(rq); rq = requestAnimationFrame(paintList); }
+function paintList() {
+  const list = $('list');
+  if (tab === 'people') return paintPeople(list);
+  if (!chatsReady) return list.replaceChildren(...skel());
+  list.replaceChildren(...(chats.length ? chats.map(row) : [el('p', { class: 'note', text: 'No conversations yet. Open People to start one.' })]));
+}
+function showTab(tb) {
+  tab = tb;
+  $('tabChats').setAttribute('aria-selected', tb === 'chats');
+  $('tabPeople').setAttribute('aria-selected', tb === 'people');
+  renderList();
+}
+function startChats() {
+  const q = R.query(R.ref(rdb, 'userChats/' + me.uid), R.orderByChild('at'), R.limitToLast(30));
+  return R.onValue(q, (snap) => {
+    const list = [];
+    snap.forEach((s) => { const v = s.val() || {}; list.push({ id: s.key, type: v.type, peer: v.peer, name: v.name, lastMessage: v.last ? { ...v.last, at: v.at } : null }); });
+    chats = list.reverse();
+    chatsReady = true;
+    renderList();
+    fetchProfiles(chats.map((c) => c.peer).filter(Boolean));
+  }, () => { $('list').replaceChildren(el('p', { class: 'note', text: 'Could not load chats.' })); });
+}
+
+// ── People: every account is listed, no searching ──
+const skel = () => Array.from({ length: 6 }, () => el('div', { class: 'skel' }));
+let people = null, peopleAt = 0;
+async function loadPeople() {
+  if (people && Date.now() - peopleAt < 60000) return;
+  try {
+    const s = await R.get(R.query(R.ref(rdb, 'users'), R.orderByChild('usernameLower'), R.limitToFirst(200)));
+    const all = [];
+    s.forEach((c) => { all.push(c.val()); });
+    all.forEach((u) => { PC[u.uid] = { name: u.name, username: u.username }; });
+    savePC();
+    people = all.filter((u) => u.uid !== me.uid);
+  } catch { people = people || []; }
+  peopleAt = Date.now();
+  if (tab === 'people') renderList();
+}
+function paintPeople(list) {
+  if (!people) { list.replaceChildren(...skel()); loadPeople(); return; }
+  list.replaceChildren(...(people.length ? people.map((u) =>
+    el('button', { class: 'row', type: 'button', onclick: () => openDirect(u.uid) },
+      el('div', { class: 'avatar', text: initial(u.name) }),
+      el('div', { class: 'row__main' }, el('span', { class: 'row__name', text: u.name }), el('p', { class: 'row__prev', text: '@' + u.username })))) : [el('p', { class: 'note', text: 'No other accounts yet.' })]));
+  loadPeople();
+}
+async function openDirect(peer) {
+  const [a, b] = [me.uid, peer].sort(), id = a + '_' + b, r = R.ref(rdb, 'chats/' + id);
+  let exists = false;
+  try { exists = (await R.get(r)).exists(); } catch { /* rules deny reads of a chat that does not exist yet */ }
+  try {
+    if (!exists) await R.set(r, { type: 'direct', a, b, createdBy: me.uid, createdAt: R.serverTimestamp(), memberCount: 2, members: { [a]: true, [b]: true } });
+    location.hash = '#/chats/' + id;
+  } catch { toast('Could not start that chat.'); }
+}
+// Full chat info (members, admins) read on demand; the list only holds a small summary per chat.
+async function chatInfo(id) {
+  const v = (await R.get(R.ref(rdb, 'chats/' + id))).val();
+  if (!v || !v.members || !v.members[me.uid]) return null;
+  const memberIds = Object.keys(v.members);
+  return { id, type: v.type, name: v.name, memberIds, memberCount: v.memberCount || memberIds.length, admins: Object.keys(v.admins || {}), peer: v.type === 'direct' ? memberIds.find((x) => x !== me.uid) : null };
+}
+
+// ── Sheets and groups ──
+function openSheet(title, ...kids) {
+  const box = $('sheetBox');
+  box.replaceChildren(el('h2', { text: title }), ...kids);
+  $('sheet').hidden = false;
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) box.animate([{ transform: 'translateY(40px)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 200, easing: 'cubic-bezier(0.16,1,0.3,1)' });
+}
+const closeSheet = () => { $('sheet').hidden = true; };
+function pickList(users) {
+  const boxes = users.map((u) => ({ u, cb: el('input', { type: 'checkbox' }) }));
+  return {
+    nodes: users.length ? boxes.map(({ u, cb }) => el('label', { class: 'pick' }, cb, el('div', { class: 'avatar', text: initial(u.name) }),
+      el('div', { class: 'row__main' }, el('span', { class: 'row__name', text: u.name }), el('p', { class: 'row__prev', text: '@' + u.username }))))
+      : [el('p', { class: 'note', text: 'No one to pick.' })],
+    selected: () => boxes.filter((b) => b.cb.checked).map((b) => b.u.uid)
+  };
+}
+const keyError = (e) => (e.message === 'nokey'
+  ? `${(people || []).find((u) => u.uid === e.peer)?.name || 'Someone'} has not opened the updated app yet, so they have no encryption key.`
+  : 'Something went wrong. Try again.');
+async function createGroup(name, uids) {
+  const gid = R.push(R.ref(rdb, 'chats')).key, memberIds = [me.uid, ...uids];
+  const raw = crypto.getRandomValues(new Uint8Array(32));
+  const wrapped = {}, members = {};
+  for (const m of memberIds) { wrapped[m] = await wrapGroupKey(m, gid, raw); members[m] = true; }
+  // step 1 creates the group; step 2 hands out keys and puts it in everyone's list (rules check membership from step 1)
+  await R.set(R.ref(rdb, 'chats/' + gid), { type: 'group', name, description: '', createdBy: me.uid, createdAt: R.serverTimestamp(), memberCount: memberIds.length, members, admins: { [me.uid]: true } });
+  const up = {};
+  for (const m of memberIds) { up[`keys/${gid}/${m}`] = wrapped[m]; up[`userChats/${m}/${gid}`] = { type: 'group', name, at: R.serverTimestamp() }; }
+  await R.update(R.ref(rdb), up);
+  GK.set(gid, Promise.resolve({ key: await importGroupKey(raw), raw }));
+  return gid;
+}
+async function newGroupSheet() {
+  if (!me.priv) return void toast('Secure messaging is still starting. Try again in a moment.');
+  await loadPeople();
+  const name = el('input', { class: 'input', placeholder: 'Group name', maxlength: '40', 'aria-label': 'Group name' });
+  const picks = pickList(people || []);
+  const err = el('p', { class: 'form-msg form-error', role: 'alert' });
+  const go = el('button', { class: 'btn btn--primary', type: 'button', text: 'Create group', onclick: async () => {
+    const n = clean(name.value).slice(0, 40), uids = picks.selected();
+    if (!n) return void (err.textContent = 'Enter a group name.');
+    if (!uids.length) return void (err.textContent = 'Pick at least one person.');
+    go.disabled = true; err.textContent = '';
+    try { const gid = await createGroup(n, uids); closeSheet(); location.hash = '#/chats/' + gid; }
+    catch (e) { err.textContent = keyError(e); go.disabled = false; }
+  } });
+  openSheet('New group', name, el('div', {}, ...picks.nodes), err, el('div', { class: 'sheet__actions' }, el('button', { class: 'btn', type: 'button', text: 'Cancel', onclick: closeSheet }), go));
+}
+async function groupSheet(c) {
+  const admin = c.admins?.includes(me.uid);
+  await fetchProfiles(c.memberIds);
+  const rows = c.memberIds.map((uid) => {
+    const p = PC[uid] || { name: 'Unknown', username: 'unknown' };
+    return el('div', { class: 'pick' }, el('div', { class: 'avatar', text: initial(p.name) }),
+      el('div', { class: 'row__main' }, el('span', { class: 'row__name', text: p.name + (uid === me.uid ? ' (you)' : '') + (c.admins?.includes(uid) ? ' · admin' : '') }), el('p', { class: 'row__prev', text: '@' + p.username })));
+  });
+  const actions = el('div', { class: 'sheet__actions' });
+  if (admin) actions.append(el('button', { class: 'btn', type: 'button', text: 'Add people', onclick: () => addPeopleSheet(c) }));
+  actions.append(el('button', { class: 'btn btn--danger', type: 'button', text: 'Leave group', onclick: () => leaveGroup(c) }));
+  openSheet(c.name || 'Group', el('p', { class: 'note', text: `${c.memberIds.length} members · end-to-end encrypted` }), ...rows, actions);
+}
+async function addPeopleSheet(c) {
+  await loadPeople();
+  const picks = pickList((people || []).filter((u) => !c.memberIds.includes(u.uid)));
+  const err = el('p', { class: 'form-msg form-error', role: 'alert' });
+  const go = el('button', { class: 'btn btn--primary', type: 'button', text: 'Add', onclick: async () => {
+    const uids = picks.selected();
+    if (!uids.length) return void (err.textContent = 'Pick at least one person.');
+    go.disabled = true; err.textContent = '';
+    try {
+      const { raw } = await groupEntry(c.id), wrapped = {}, add = {};
+      for (const uid of uids) wrapped[uid] = await wrapGroupKey(uid, c.id, raw);
+      uids.forEach((uid) => { add[`chats/${c.id}/members/${uid}`] = true; });
+      add[`chats/${c.id}/memberCount`] = c.memberIds.length + uids.length;
+      await R.update(R.ref(rdb), add);
+      const up = {};
+      for (const uid of uids) { up[`keys/${c.id}/${uid}`] = wrapped[uid]; up[`userChats/${uid}/${c.id}`] = { type: 'group', name: c.name, at: R.serverTimestamp() }; }
+      await R.update(R.ref(rdb), up);
+      closeSheet(); toast('People added.');
+    } catch (e) { err.textContent = keyError(e); go.disabled = false; }
+  } });
+  openSheet('Add people', el('div', {}, ...picks.nodes), err, el('div', { class: 'sheet__actions' }, el('button', { class: 'btn', type: 'button', text: 'Back', onclick: () => groupSheet(c) }), go));
+}
+async function leaveGroup(c) {
+  if (!confirm('Leave this group? You will stop receiving its messages.')) return;
+  try {
+    await R.update(R.ref(rdb), { [`chats/${c.id}/members/${me.uid}`]: null, [`userChats/${me.uid}/${c.id}`]: null, [`chats/${c.id}/memberCount`]: c.memberIds.length - 1 });
+    closeSheet(); location.hash = '#/chats';
+  } catch { toast('Could not leave the group.'); }
+}
+
+// ── Conversation ──
+function closeChat() { if (activeId) markRead(activeId); cleanups.forEach((f) => { try { f(); } catch { /* already closed */ } }); cleanups = []; }
+const paneEmpty = () => $('pane').replaceChildren(el('p', { class: 'empty-pane', text: 'Select a conversation' }));
+
+async function openChat(id) {
+  if (id === activeId && cleanups.length) { $('app').dataset.view = 'chat'; return; }
+  closeChat();
+  activeId = id;
+  $('app').dataset.view = 'chat';
+  renderList();
+  let c = null;
+  try { c = await chatInfo(id); } catch { /* not a member */ }
+  if (activeId !== id) return;
+  if (!c || !c.memberIds?.includes(me.uid)) {
+    return $('pane').replaceChildren(el('p', { class: 'empty-pane', text: 'Conversation not found.' }), el('a', { class: 'link note', href: '#/chats', text: 'Back to chats' }));
+  }
+  const peer = c.type === 'direct' ? c.memberIds.find((x) => x !== me.uid) : null;
+  const mcol = R.ref(rdb, 'messages/' + id);
+  const kf = keyFor(c);
+  const title = el('strong', { text: peer ? '…' : c.name || 'Group' });
+  const status = el('small', { text: '' });
+  const av = el('div', { class: 'avatar', text: peer ? '' : initial(c.name) });
+  const older = el('button', { class: 'btn older', type: 'button', text: 'Load earlier messages', onclick: () => loadOlder() });
+  const empty = el('p', { class: 'empty', text: 'Say hello.' });
+  const msgs = el('div', { class: 'msgs', role: 'log', 'aria-live': 'polite' }, older, empty);
+  const ta = el('textarea', { rows: '1', maxlength: '2000', placeholder: 'Message', 'aria-label': 'Message' });
+  const sendBtn = el('button', { class: 'send', type: 'button', 'aria-label': 'Send' }, icon('send'));
+  const FPK = 'orbit.fp';
+  const checkFp = () => {
+    if (!peer || !me.priv) return;
+    safetyCode(peer).then((code) => {
+      let fp = {}; try { fp = JSON.parse(localStorage.getItem(FPK) || '{}'); } catch { /* ignore */ }
+      if (fp[peer] && fp[peer] !== code) toast(`⚠ Security code with ${title.textContent} changed. Verify it with them.`);
+      fp[peer] = code;
+      try { localStorage.setItem(FPK, JSON.stringify(fp)); } catch { /* storage blocked */ }
+    }).catch(() => {});
+  };
+  const vbtn = el('button', { class: 'iconbtn vbtn', type: 'button', 'aria-label': 'Verify encryption', onclick: async () => {
+    try {
+      const code = await safetyCode(peer);
+      alert(`Security code with ${title.textContent}\n\n${code}\n\nCompare this with ${title.textContent} in person or on a call. If it matches, nobody can read or change your chat in between.`);
+    } catch { toast('Encryption keys are not ready yet.'); }
+  } }, icon('lock'));
+  const gbtn = el('button', { class: 'iconbtn vbtn', type: 'button', 'aria-label': 'Group info', onclick: async () => { const fresh = await chatInfo(id); if (fresh) groupSheet(fresh); } }, icon('users'));
+  $('pane').replaceChildren(
+    el('header', { class: 'chead' }, el('a', { class: 'iconbtn back', href: '#/chats', 'aria-label': 'Back' }, icon('back')), av, el('div', { class: 'chead__t' }, title, status), peer ? vbtn : gbtn),
+    msgs, el('div', { class: 'compose' }, ta, sendBtn));
+
+  let typingNow = false, online = false, tTimer, W = null, tt, lastW = 0, alive = true;
+  const setStatus = () => {
+    status.textContent = typingNow ? 'typing…' : peer ? (online ? 'online' : 'offline') : `${c.memberCount || c.memberIds.length} members`;
+    status.classList.toggle('is-typing', typingNow);
+    av.classList.toggle('is-online', online);
+  };
+  if (peer) getProfile(peer).then((p) => { title.textContent = p.name; av.textContent = initial(p.name); setStatus(); });
+  setStatus();
+  const typingStop = () => { clearTimeout(tt); if (!lastW) return; lastW = 0; W?.({ typing: false, at: Date.now() }); };
+  cleanups.push(() => { alive = false; clearTimeout(tTimer); }, typingStop);
+  cleanups.push(R.onValue(R.ref(rdb, `chats/${id}/members`), (s) => {
+    const v = s.val();
+    if (!v) return;
+    c.memberIds = Object.keys(v); c.memberCount = c.memberIds.length;
+    if (!v[me.uid]) location.hash = '#/chats';
+    setStatus();
+  }, () => {}));
+  rt().then(({ m: R, db: rdb }) => {
+    if (!alive) return;
+    cleanups.push(R.onValue(R.ref(rdb, 'typing/' + id), (s) => {
+      const n = Date.now();
+      typingNow = Object.entries(s.val() || {}).some(([u, v]) => u !== me.uid && v.typing && n - v.at < 3500);
+      setStatus(); clearTimeout(tTimer);
+      if (typingNow) tTimer = setTimeout(() => { typingNow = false; setStatus(); }, 3600);
+    }));
+    if (peer) cleanups.push(R.onValue(R.ref(rdb, 'presence/' + peer), (s) => { online = s.val()?.state === 'online'; setStatus(); }));
+    const mine = R.ref(rdb, `typing/${id}/${me.uid}`);
+    R.onDisconnect(mine).remove().catch(() => {});
+    W = (v) => R.set(mine, v).catch(() => {});
+  });
+
+  // incremental message DOM: nodes are created once so entry animations never replay
+  const store = new Map(), nodes = new Map(), plain = new Map(), asking = new Set(), pendingIds = new Set();
+  let rs = 0;
+  const resync = () => { cancelAnimationFrame(rs); rs = requestAnimationFrame(() => sync(pinned)); };
+  const kw = () => { resync(); checkFp(); };
+  keyWaiters.add(kw); cleanups.push(() => keyWaiters.delete(kw));
+  if (peer) checkFp();
+  const body = (m) => {
+    if (m.deleted) return 'Message deleted';
+    if (m.enc !== 1) return m.text;                 // message from before encryption was added
+    if (plain.has(m.id)) return plain.get(m.id) ?? '🔒 Can’t decrypt this message';
+    if (me.priv && !asking.has(m.id)) {
+      asking.add(m.id);
+      unseal(kf, id, m.senderId, m).then((x) => { plain.set(m.id, x); resync(); });
+    }
+    return '…';
+  };
+  let oldest = null, noMore = false, first = true, live = false, pinned = true, loadingOlder = false;
+  const at = (m) => ms(m.at);
+  function sync(stick) {
+    const list = [...store.values()].sort((a, b) => at(a) - at(b) || a.id.localeCompare(b.id));
+    empty.hidden = list.length > 0;
+    older.hidden = noMore;
+    let prev = older, prevMsg = null;
+    for (const m of list) {
+      const mineMsg = m.senderId === me.uid;
+      let n = nodes.get(m.id);
+      if (!n) {
+        n = el('div', {}, el('div', { class: 'bubble' }, el('span', { class: 'sender' }), el('span', { class: 'txt' }), el('span', { class: 'meta' })));
+        nodes.set(m.id, n);
+        const mid = m.id;
+        n.addEventListener('dblclick', async () => {
+          const cur = store.get(mid);
+          if (!cur || cur.deleted || cur.pending || cur.senderId !== me.uid) return;
+          if (!confirm('Delete this message for everyone?')) return;
+          try { await R.update(R.child(mcol, mid), { deleted: true, text: '.' }); } catch { toast('Could not delete the message.'); }
+        });
+      }
+      const isFirst = !prevMsg || prevMsg.senderId !== m.senderId;
+      n.className = `msg ${mineMsg ? 'msg--me' : 'msg--them'}${isFirst ? ' msg--first' : ''}${m.deleted ? ' msg--del' : ''}${live && !n.dataset.seen ? ' msg--enter' : ''}`;
+      n.dataset.seen = '1';
+      const [who, txt, meta] = n.firstChild.children;
+      who.hidden = !(c.type === 'group' && !mineMsg && isFirst);
+      who.textContent = m.senderName || '';
+      txt.textContent = body(m);
+      meta.textContent = hm.format(at(m) || Date.now()) + (m.edited || m.editedAt ? ' · edited' : '') + (m.pending ? ' · sending' : '');
+      if (n.previousElementSibling !== prev) msgs.insertBefore(n, prev.nextSibling);
+      prev = n; prevMsg = m;
+    }
+    if (stick) msgs.scrollTop = msgs.scrollHeight;
+  }
+  cleanups.push(R.onValue(R.query(mcol, R.orderByKey(), R.limitToLast(30)), (snap) => {
+    let mineAdded = false, firstKey = null;
+    snap.forEach((s) => {
+      const v = s.val();
+      if (firstKey === null) firstKey = s.key;
+      if (!store.has(s.key) && v.senderId === me.uid) mineAdded = true;
+      store.set(s.key, { id: s.key, ...v, pending: pendingIds.has(s.key) });
+    });
+    if (first) { oldest = firstKey; noMore = snap.size < 30; }
+    sync(first || pinned || mineAdded);
+    first = false; live = true;
+  }, () => { empty.textContent = 'Could not load messages.'; }));
+
+  async function loadOlder() {
+    if (loadingOlder || noMore || !oldest) return;
+    loadingOlder = true;
+    try {
+      const s = await R.get(R.query(mcol, R.orderByKey(), R.endBefore(oldest), R.limitToLast(30)));
+      if (s.size < 30) noMore = true;
+      let firstKey = null;
+      const h = msgs.scrollHeight;
+      s.forEach((d) => { if (firstKey === null) firstKey = d.key; store.set(d.key, { id: d.key, ...d.val() }); });
+      if (firstKey) oldest = firstKey;
+      live = false; sync(false); live = true;
+      msgs.scrollTop += msgs.scrollHeight - h;
+    } catch { toast('Could not load earlier messages.'); }
+    finally { loadingOlder = false; }
+  }
+  msgs.addEventListener('scroll', () => {
+    pinned = msgs.scrollHeight - msgs.scrollTop - msgs.clientHeight <= 40;
+    if (msgs.scrollTop < 80) loadOlder();
+  }, { passive: true });
+
+  const resize = () => { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 120) + 'px'; };
+  async function send() {
+    const text = clean(ta.value);
+    if (!text) return;
+    if (!me.priv) return void toast('Secure messaging is still starting. Try again in a moment.');
+    ta.value = ''; resize(); typingStop();
+    navigator.vibrate?.(10);
+    const mkey = R.push(mcol).key;
+    let a, b;
+    try { [a, b] = await Promise.all([seal(kf, id, me.uid, text), seal(kf, id, me.uid, text.slice(0, 120))]); }
+    catch (e) {
+      ta.value = text; resize();
+      return void toast(e.message === 'nokey' ? (peer ? `${title.textContent} has not set up secure messaging yet.` : 'This group’s key is not available to you.') : 'Could not encrypt the message.');
+    }
+    plain.set(mkey, text); pendingIds.add(mkey);
+    // one atomic write: the message plus the preview in every member's chat list
+    const upd = { [`messages/${id}/${mkey}`]: { text: a.text, iv: a.iv, enc: 1, senderId: me.uid, senderName: me.name, at: R.serverTimestamp(), deleted: false } };
+    const last = { text: b.text, iv: b.iv, enc: 1, senderId: me.uid, senderName: me.name };
+    for (const m of c.memberIds) {
+      upd[`userChats/${m}/${id}`] = { type: c.type, ...(peer ? { peer: m === me.uid ? peer : me.uid } : { name: c.name }), at: R.serverTimestamp(), last };
+    }
+    R.update(R.ref(rdb), upd)
+      .then(() => { pendingIds.delete(mkey); const m = store.get(mkey); if (m) { m.pending = false; resync(); } })
+      .catch(() => {
+        pendingIds.delete(mkey); plain.delete(mkey); store.delete(mkey); nodes.get(mkey)?.remove(); nodes.delete(mkey);
+        ta.value = text; resize(); toast('Message not sent. Check your connection and try again.');
+      });
+  }
+  sendBtn.addEventListener('click', send);
+  ta.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !matchMedia('(pointer: coarse)').matches) { e.preventDefault(); send(); } });
+  ta.addEventListener('input', () => {
+    resize();
+    if (!ta.value.trim()) return typingStop();
+    const n = Date.now();
+    if (n - lastW > 2000) { lastW = n; W?.({ typing: true, at: n }); }
+    clearTimeout(tt); tt = setTimeout(typingStop, 3000);
+  });
+}
+
+// ── Routing: #/chats, #/chats/:id, #/people ──
+function route() {
+  const m = (location.hash.replace(/^#/, '') || '/chats').match(/^\/(chats|people)(?:\/([^/?]+))?\/?(?:\?.*)?$/);
+  if (!m || (m[1] === 'people' && m[2])) return void location.replace('#/chats');
+  showTab(m[1]);
+  if (m[1] === 'people') { $('app').dataset.view = 'list'; if (!activeId) paneEmpty(); return; }
+  if (m[2]) return void openChat(decodeURIComponent(m[2]));
+  closeChat(); activeId = null; $('app').dataset.view = 'list'; paneEmpty();
+}
+
+const ss = {
+  get: (k) => { try { return sessionStorage.getItem(k); } catch { return null; } },
+  set: (k, v) => { try { sessionStorage.setItem(k, v); } catch { /* storage blocked */ } },
+  del: (k) => { try { sessionStorage.removeItem(k); } catch { /* storage blocked */ } }
+};
+
+// ── Profile: accounts are made by the admin in Firebase, so the profile is created on first sign-in ──
+async function provision(u) {
+  const base = (u.email || 'user').split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 16);
+  const local = base.length >= 3 ? base : (base + 'user').slice(0, 16);
+  const name = (u.displayName || local.charAt(0).toUpperCase() + local.slice(1)).slice(0, 40);
+  for (let i = 0; i < 6; i++) {
+    const username = local + (i ? String(Math.floor(Math.random() * 90) + 10) : '');
+    const profile = {
+      uid: u.uid, username, usernameLower: username.toLowerCase(), name, bio: '',
+      createdAt: R.serverTimestamp(), updatedAt: R.serverTimestamp(),
+      settings: { theme: 'dark', fontScale: 1, notifications: true }
+    };
+    try {
+      // atomic: if the username is already taken the rules reject the whole write
+      await R.update(R.ref(rdb), { ['usernames/' + username.toLowerCase()]: u.uid, ['users/' + u.uid]: profile });
+      return (await R.get(R.ref(rdb, 'users/' + u.uid))).val();
+    } catch (e) { if (e?.code !== 'PERMISSION_DENIED') throw e; }
+  }
+  throw new Error('No free username');
+}
+async function loadProfile(u) {
+  let p = null;
+  try { const s = await R.get(R.ref(rdb, 'users/' + u.uid)); if (s.exists()) p = s.val(); } catch { /* offline */ }
+  if (!p && navigator.onLine) { try { p = await provision(u); } catch { /* retried next load */ } }
+  if (!p) return null;
+  me.name = p.name; me.username = p.username; fillMe();
+  try { localStorage.setItem('orbit.me', JSON.stringify({ uid: u.uid, name: p.name, username: p.username })); } catch { /* storage blocked */ }
+  if (p.settings) {
+    applyTheme(p.settings.theme);
+    document.documentElement.style.setProperty('--font-scale', p.settings.fontScale || 1);
+    try { localStorage.setItem('orbit.theme', p.settings.theme); } catch { /* storage blocked */ }
+  }
+  return p;
+}
+
+let started = false, presP = null;
+const fillMe = () => {
+  $('meAv').textContent = initial(me.name);
+  $('meName').textContent = me.name;
+  $('meHandle').textContent = me.username ? '@' + me.username : '';
+};
+async function stopPresence() { if (!presP) return; try { (await presP)(); } catch { /* never started */ } }
+async function doSignOut() {
+  $('out').disabled = true;
+  ss.del('orbit.unlocked');
+  try { ['orbit.hint', 'orbit.me', 'orbit.pc'].forEach((k) => localStorage.removeItem(k)); } catch { /* storage blocked */ }
+  closeChat();
+  await stopPresence();
+  await signOut(auth);
+  location.replace('index.html');
+}
+document.addEventListener('orbit:signout', doSignOut);
+if (window.__wantExit) doSignOut();
+// Re-lock after the tab has been in the background for two minutes
+let hiddenAt = 0;
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) hiddenAt = Date.now();
+  else if (hiddenAt && Date.now() - hiddenAt > 120000) { ss.del('orbit.unlocked'); location.reload(); }
+});
+
+onAuthStateChanged(auth, async (u) => {
+  if (!u) {
+    ss.del('orbit.unlocked');
+    try { localStorage.removeItem('orbit.hint'); } catch { /* storage blocked */ }
+    return location.replace('index.html');
+  }
+  if (started) return;
+  started = true;
+  me.uid = u.uid; me.name = (u.email || 'me').split('@')[0];
+  try { const c = JSON.parse(localStorage.getItem('orbit.me') || 'null'); if (c && c.uid === u.uid) { me.name = c.name; me.username = c.username; } } catch { /* ignore */ }
+  fillMe();
+  await window.orbitLock;                       // PIN was typed while the SDK was still downloading
+  startChats();
+  route();
+  addEventListener('hashchange', route);
+  const keysP = loadLocalKeys(u.uid).then(() => { renderList(); keyWaiters.forEach((f) => f()); });
+  Promise.all([keysP, loadProfile(u)]).then(([, p]) => ensureKeys(u, p));   // never blocks the UI
+  requestAnimationFrame(() => { presP = startPresence(u.uid); });
+});
+
+$('gBtn').append(icon('plus'));
+$('gBtn').addEventListener('click', newGroupSheet);
+$('scrim').addEventListener('click', closeSheet);
+addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet(); });
+$('tabChats').addEventListener('click', () => { location.hash = activeId && matchMedia('(min-width: 768px)').matches ? '#/chats/' + activeId : '#/chats'; });
+$('tabPeople').addEventListener('click', () => { location.hash = '#/people'; });
+$('out').addEventListener('click', doSignOut);
+addEventListener('offline', () => toast('You are offline. Messages will send when you reconnect.'));
+</script>
+</body>
+</html>
